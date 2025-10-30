@@ -44,7 +44,7 @@ def send_gpt_edit_request(
     img_data = client.images.edit(
         model="gpt-image-1",
         image=open(input_image_path, "rb"),  # the image to edit
-        prompt="right eye melting down",  # text prompt to guide the edit
+        prompt=prompt,  # text prompt to guide the edit
         n=n_out,  # number of output images
         size="1024x1024"
     )
