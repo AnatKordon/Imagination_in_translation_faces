@@ -245,8 +245,7 @@ def generate_images(prompt: str, negative_prompt: str, seed: int, session: int, 
     
     elif config.API_CALL == "open_ai":  # it inherently generates 4 images
         returned_seed = np.nan # since gpt doesn't have seeds
-        image_bytes = None
-        local_paths = gpt_model.send_gpt_edit_request(
+        local_paths, image_bytes = gpt_model.send_gpt_edit_request(
             #I should add loging of the revised prompt of selected image...
             prompt=params["prompt"],
             input_image_path=params["gt"],

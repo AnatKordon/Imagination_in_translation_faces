@@ -59,7 +59,7 @@ def send_gpt_edit_request(
         # print(f"revised prompt is: {rp}")
         # revised_prompts.append(rp)
 
-    return local_paths # revised_prompts
+    return local_paths, image_bytes # revised_prompts
 
 
 
