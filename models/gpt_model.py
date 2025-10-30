@@ -29,14 +29,25 @@ def send_gpt_edit_request(
     The result(s) are saved locally and returned as file paths.
     """
 
-    # Generate edited images
-    img_data = client.images.edits(
-        model="gpt-image-1",
-        image=open(input_image_path, "rb"),  # the image to edit
-        prompt=prompt,
-        n=n_out,  # number of output images
-        size="1024x1024"
-    )
+    img_data = client.images.edit(
+                image=open(input_image_path, "rb"),
+                prompt="make the right eye melt down",
+                model="gpt-image-1",
+                n=1,
+                size="1024x1024",
+                quality="auto",
+                background="auto",
+                moderation="auto",
+                input_fidelity="low",
+                )
+    # # Generate edited images
+    # img_data = client.images.edits(
+    #     model="gpt-image-1",
+    #     image=open(input_image_path, "rb"),  # the image to edit
+    #     prompt=prompt,
+    #     n=n_out,  # number of output images
+    #     size="1024x1024"
+    # )
 
     GEN_DIR.mkdir(parents=True, exist_ok=True)
     local_paths: List[Path] = []
