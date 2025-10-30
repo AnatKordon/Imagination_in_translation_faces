@@ -114,7 +114,7 @@ venv311
 #images
 *.png
 # *.jpg
-*.jpeg
+# *.jpeg
 *.csv
 client_secrets.json
 service_account.json

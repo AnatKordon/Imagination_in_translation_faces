@@ -388,6 +388,7 @@ def next_gt():
         # st.stop()
 
     remaining = [p for p in config.GT_DIR.glob("*.[pj][pn]g") if p.name not in S.used]
+    print(len(remaining), "remaining GT images")
     if not remaining:
         S.finished = True
         rerun()
