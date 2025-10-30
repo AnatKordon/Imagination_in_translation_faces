@@ -652,7 +652,7 @@ if S.gt_path is None:
 left, right = st.columns([1, 2], gap="large")
 
 # st.markdown(
-#     "**Please, describe the picture as precisely as possible in English only. You have 4 attempts to improve your description. \n'Press ctrl + enter buttons after you are done typing to apply the text. Note that you cannot use the same description twice.**"
+#     "**Please, describe the picture as you percieve it as precisely as possible in English only. You have 3 attempts to improve your description. \n'Press ctrl + enter buttons after you are done typing to apply the text. Note that you cannot use the same description twice.**"
 # )
 # left column: textbox for descriptive prompt and "generate" and "exit" buttons.
 with left:
@@ -675,15 +675,15 @@ with left:
         c1.caption(f"{len(prompt_val)} characters")
         c2.caption(f"{S.attempt} / {config.REQUIRED_ATTEMPTS}")
 
-        #negative prompt area
-        neg_text_disabled = S.generated  or (S.attempt == 1)# same behavior as main textbox
-        neg_val = st.text_area(
-            "Negative prompt: if there is an item/object in the generated image that does not appear in the original image and you want to remove it, you can write it down here: (optional from second attempt onwards)",
-            key=S.neg_text_key,
-            height=100,
-            placeholder="e.g., objects, people, text.",
-            disabled=neg_text_disabled
-        )
+        # #negative prompt area
+        # neg_text_disabled = S.generated  or (S.attempt == 1)# same behavior as main textbox
+        # neg_val = st.text_area(
+        #     "Negative prompt: if there is an item/object in the generated image that does not appear in the original image and you want to remove it, you can write it down here: (optional from second attempt onwards)",
+        #     key=S.neg_text_key,
+        #     height=100,
+        #     placeholder="e.g., objects, people, text.",
+        #     disabled=neg_text_disabled
+        # )
 
 
         # ---- two side-by-side form submit buttons - generate or another try/done ----
@@ -715,7 +715,7 @@ with left:
         #regular text:
         raw_text = st.session_state.get(S.text_key, "")
         #negative prompt text
-        raw_neg = st.session_state.get(S.neg_text_key, "")
+        # raw_neg = st.session_state.get(S.neg_text_key, "")
         # allow only these chars
         allowed_full_line = re.compile(r'^[a-zA-Z0-9\s\.\,\!\?\:\;\'\"\-\(\)]*$')
 
@@ -733,24 +733,24 @@ with left:
         if S.attempt > 1 and raw_text.strip() == S.last_prompt.strip():
             errors.append("Please modify your description before generating again.")
 
-        # --- NEGATIVE PROMPT (optional) ---
-        neg_used = ""
-        if not errors:
-            if S.attempt == 1:
-                # Ignore anything they somehow typed (defense in depth)
-                neg_used = ""
-            else:
-                if S.attempt > 1 and raw_neg.strip():
-                    if not allowed_full_line.match(raw_neg):
-                        errors.append("Negative prompt: Please use only letters, numbers, spaces, and . , ! ? : ; ' \" - ( ).")
-                    if any(i in raw_neg for i in config.websites):
-                        errors.append("Negative prompt: links are not allowed.")
-                    # only truncate after it passes symbol/link validation
-                    neg_used = raw_neg[: config.MAX_LENGTH - 1].strip()
+        # # --- NEGATIVE PROMPT (optional) ---
+        # neg_used = ""
+        # if not errors:
+        #     if S.attempt == 1:
+        #         # Ignore anything they somehow typed (defense in depth)
+        #         neg_used = ""
+        #     else:
+        #         if S.attempt > 1 and raw_neg.strip():
+        #             if not allowed_full_line.match(raw_neg):
+        #                 errors.append("Negative prompt: Please use only letters, numbers, spaces, and . , ! ? : ; ' \" - ( ).")
+        #             if any(i in raw_neg for i in config.websites):
+        #                 errors.append("Negative prompt: links are not allowed.")
+        #             # only truncate after it passes symbol/link validation
+        #             neg_used = raw_neg[: config.MAX_LENGTH - 1].strip()
 
         #if only neg prompt is modified - don't allow it:
-        if not errors and S.attempt > 1 and raw_text.strip() == S.last_prompt.strip() and neg_used and neg_used != S.neg_prompt:
-            errors.append("Please modify your main description, not only the negative prompt.")
+        # if not errors and S.attempt > 1 and raw_text.strip() == S.last_prompt.strip() and neg_used and neg_used != S.neg_prompt:
+        #     errors.append("Please modify your main description, not only the negative prompt.")
         
         # Validate main prompt
         # --- collect validation errors without st.stop() ---
@@ -767,7 +767,7 @@ with left:
         else:
 
             # --- proceed to generation ---
-            S.neg_prompt = neg_used
+            # S.neg_prompt = neg_used
             prompt_used  = raw_text[: config.MAX_LENGTH - 1]
             S.prompt     = prompt_used.strip()
 
@@ -971,7 +971,7 @@ with right:
         st.caption("_Rate similarity_")
         # S.subjective_score = 
         st.slider(
-            "Please, rate the Similarity between the **Generated Image** and **Target Image** (0 = not similar, 100 = very similar)",
+            "Please, rate the Similarity between the **Generated Image** and the image you have in mind (0 = not similar, 100 = very similar)",
             min_value=0,
             max_value=100,
             value=50,  # default position
