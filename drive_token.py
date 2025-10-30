@@ -1,4 +1,4 @@
-# one_time_get_token.py
+# getting the token.json file for google drive access
 from google_auth_oauthlib.flow import InstalledAppFlow
 
 SCOPES = ["https://www.googleapis.com/auth/drive.file"]

@@ -1,11 +1,11 @@
-# To call the app, write:  run ui/ui_prototype.py --server.port 8501 in the codespace terminal  but first, install the required libraries listed in the requirements.txt file with a single command: pip install -r requirements.txt.
+# To call the app locally (no deployment), write: streamlit run app.py --server.port 8501 in the codespace terminal  but first, install the required libraries listed in the requirements.txt file with a single command: pip install -r requirements.txt.
 # Note, that by default a user has to press ctrl+enter after filling in the text box to apply the text, count characters, send it to generation etc. 
 from pathlib import Path
 import config       
 import streamlit.components.v1 as components
 from models import api_model # the model API wrapper for Stability AI
 # removed it for now as we are not using it and i don't wantit to be imported
-#from models import gpt_model # the model API wrapper for open ai
+from models import gpt_model # the model API wrapper for open ai
 from drive_utils import build_drive_from_token_dict, ensure_folder, ensure_path, update_or_insert_file, extract_folder_id, get_token_dict_from_secrets_or_env
 # from similarity import vgg_similarity # the similarity function 
 from uuid import uuid4 # used to create session / user IDs
@@ -236,21 +236,23 @@ def generate_images(prompt: str, negative_prompt: str, seed: int, session: int, 
             returned_seeds.append(returned_seed)
             images_bytes.append(image_bytes)
 
-    # elif config.API_CALL == "open_ai":  # it inherently generates 4 images
-    #     #currently unavailable - i commented out the import and the installation in requirements.txt
-    #     paths = gpt_model.send_gpt_request(
-    #         #I should add loging of the revised prompt of selected image...
-    #         prompt=prompt,
-    #         iteration=attempt,
-    #         session_num=session,
-    #         user_id=uid,
-    #     )
-    #     for p in paths:
-    #         try:
-    #             resize_inplace(p, (512, 512))
-    #         except Exception as e:
-    #             print(f"❌ Error resizing image {p}: {e}")
-    #     local_paths.extend(paths)
+    
+    elif config.API_CALL == "open_ai":  # it inherently generates 4 images
+        returned_seed = np.nan # since gpt doesn't have seeds
+        local_paths = gpt_model.send_gpt_edit_request(
+            #I should add loging of the revised prompt of selected image...
+            prompt=params["prompt"],
+            input_image_path=params["gt"],
+            iteration=attempt,
+            session_num=session,
+            user_id=uid,
+        )
+        for p in local_paths:
+            try:
+                resize_inplace(p, (512, 512))
+            except Exception as e:
+                print(f"❌ Error resizing image {p}: {e}")
+        local_paths.extend(local_paths)
     else:
         st.error(f"❌ Unknown API_CALL value: {config.API_CALL}, please contact experiment owner")
     
