@@ -130,7 +130,7 @@ GEN_BOX = (300, 300)   # each generated image
 def load_gt_images_base64():
     """Load all GT images as base64 once and cache them"""
     gt_data = {}
-    for gt_path in config.GT_DIR.glob("*.[pj][pn]g"):
+    for gt_path in list_gt_images():
         img = ImageOps.contain(Image.open(gt_path), GT_BOX)
         buffered = BytesIO()
         img.save(buffered, format="PNG")
@@ -201,6 +201,12 @@ def resize_inplace(p: Path, size=(512, 512)) -> None:
 def seed_from(gt_filename: str) -> int:
     # Deterministic 32-bit seed from any string
     return int(hashlib.sha256(gt_filename.encode("utf-8")).hexdigest(), 16) % (2**32)  # 32-bit
+
+# a helper added for the remaining - to include jpeg files
+def list_gt_images():
+    """Return all GT images (png/jpg/jpeg, any case) from GT_DIR (and subfolders)."""
+    exts = {".png", ".jpg", ".jpeg"}
+    return [p for p in config.GT_DIR.rglob("*") if p.suffix.lower() in exts]
 
 #new generation of 4 images
 def generate_images(prompt: str, negative_prompt: str, seed: int, session: int, attempt: int, gt: Path, uid: str) -> list[Path]:
@@ -388,7 +394,7 @@ def next_gt():
         # st.caption("If the link doesn't work, please copy-paste the URL into your browser:\n https://app.prolific.com/submissions/complete?cc=C1OJX362 \n Or paste the following code directly inside prolific: C1OJX362")
         # st.stop()
 
-    remaining = [p for p in config.GT_DIR.glob("*.[pj][pn]g") if p.name not in S.used]
+    remaining = [p for p in list_gt_images() if p.name not in S.used] #includes jpeg files as well
     print(len(remaining), "remaining GT images")
     if not remaining:
         S.finished = True
