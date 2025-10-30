@@ -259,6 +259,7 @@ def generate_images(prompt: str, negative_prompt: str, seed: int, session: int, 
             except Exception as e:
                 print(f"❌ Error resizing image {p}: {e}")
         local_paths.extend(local_paths)
+        images_bytes = list(image_bytes)
     else:
         st.error(f"❌ Unknown API_CALL value: {config.API_CALL}, please contact experiment owner")
     
