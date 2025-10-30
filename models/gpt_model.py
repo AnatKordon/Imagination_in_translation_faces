@@ -42,23 +42,26 @@ def send_gpt_edit_request(
     local_paths: List[Path] = []
     revised_prompts: List[Optional[str]] = []
     print(f"prompt revision: {revised_prompts}")
+
+    image_bytes = [] # in case there are multiple images this should be better alligned
+    
     for i, item in enumerate(img_data.data, start=1):
         img_b64 = getattr(item, "b64_json", None)
         if not img_b64:
             raise ValueError("No base64 image found in response; set response_format='b64_json'.")
 
         # Decode and save
-        image_bytes = base64.b64decode(img_b64)
+        bytes = base64.b64decode(img_b64)
         filename = f"{user_id}_session{session_num:02d}_iter{iteration:02d}_{i:02d}_gpt_edit.png"
         path = GEN_DIR / filename
-        path.write_bytes(image_bytes)
+        path.write_bytes(bytes)
         local_paths.append(path)
-
+        image_bytes.append(bytes)
         # # Log revised prompt if returned (not common for edits)
         # rp = getattr(item, "revised_prompt", None)
         # print(f"revised prompt is: {rp}")
         # revised_prompts.append(rp)
-
+       
     return local_paths, image_bytes # revised_prompts
 
 
