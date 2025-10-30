@@ -258,7 +258,7 @@ def generate_images(prompt: str, negative_prompt: str, seed: int, session: int, 
                 resize_inplace(p, (512, 512))
             except Exception as e:
                 print(f"❌ Error resizing image {p}: {e}")
-        local_paths.extend(local_paths)
+        # local_paths.extend(local_paths)
         images_bytes = list(image_bytes)
     else:
         st.error(f"❌ Unknown API_CALL value: {config.API_CALL}, please contact experiment owner")
@@ -395,7 +395,6 @@ def next_gt():
         # st.stop()
 
     remaining = [p for p in list_gt_images() if p.name not in S.used] #includes jpeg files as well
-    print(len(remaining), "remaining GT images")
     if not remaining:
         S.finished = True
         rerun()
