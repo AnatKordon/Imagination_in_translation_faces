@@ -30,7 +30,7 @@ def send_gpt_edit_request(
     """
 
     # Generate edited images
-    img_data = client.images.edit(
+    img_data = client.images.edits(
         model="gpt-image-1",
         image=open(input_image_path, "rb"),  # the image to edit
         prompt=prompt,
