@@ -325,7 +325,7 @@ def commit_attempt_log():
     
     
     # Read the slider’s value from session (see the slider key below)
-    rating_key = f"subjective_score_{S.session}_{S.attempt}"
+    rating_key = f"similarity_score_{S.session}_{S.attempt}"
     rating = st.session_state.get(rating_key, None)
     if rating is None:
         st.warning("No similarity rating found for this attempt. Please move the slider before continuing.")
@@ -862,24 +862,30 @@ with left:
         # log with rating then either another attempt or next GT
         commit_attempt_log()  # uses the slider key; we fixed that earlier
         if is_final:
+            # moving to NEXT IMAGE → clear generated images
+            S.gen_paths = []
+            S.images_bytes = []
+            S.last_gen_meta = []
+            S.generated = False
             next_gt()
             S.text_key = fresh_key()
-            # S.last_prompt = ""     # allow changed-text validation to work correctly
         else:
-            # prepare next attempt and clear per-attempt artifacts
+            # prepare next attempt but KEEP the last generated image on screen
             old_attempt = S.attempt
             S.attempt += 1
+
+            # re-enable the Generate button for the new attempt
             S.generated = False
-            S.gen_paths = []
+
+            # we DO NOT clear S.gen_paths or S.images_bytes here,
+            # so the image stays visible as a reference
             S.last_gen_meta = []
+
             # clear rating state for the old attempt
-            st.session_state.pop(f"subjective_score_{S.session}_{old_attempt}", None)
+            st.session_state.pop(f"similarity_score_{S.session}_{old_attempt}", None)
             st.session_state.pop(f"rated_{S.session}_{old_attempt}", None)
-            # blank the textbox by rotating the key
-            # S.text_key = fresh_key()
-            # S.last_prompt = ""     # allow changed-text validation to work correctly
-            
-            start_attempt()   # <-- start timing for the new attempt
+
+            start_attempt()
 
             rerun()
 
@@ -924,24 +930,25 @@ with right:
         st.markdown('<div class="small-ital-grey">Target image</div>', unsafe_allow_html=True)
         show_img_fixed(S.gt_path, GT_BOX)  # presenting as html to avoid fullscreen
     with gen_display:
-        if not S.generated:
+        # If we have no generated images at all for this target
+        if not S.gen_paths:
             st.caption("_Generated image_")
-            st.markdown('<div class="small-ital-grey">Click **Generate** to view the image.</div>', unsafe_allow_html=True)
-        elif not S.gen_paths:
-            st.markdown('<div class="small-ital-grey">Generated image</div>', unsafe_allow_html=True)
-            st.warning("No image was produced. Please try again.")
+            st.markdown(
+                '<div class="small-ital-grey">Click <b>Generate</b> to view the image.</div>',
+                unsafe_allow_html=True
+            )
         else:
+            # We have at least one generated image – show it regardless of S.generated
             if len(S.gen_paths) == 1:
-                st.markdown('<div class="small-ital-grey">Generated image</div>', unsafe_allow_html=True)
+                st.markdown('<div class="small-ital-grey">Generated image (last attempt)</div>', unsafe_allow_html=True)
                 show_img_fixed(S.images_bytes[0], GEN_BOX)
             else:  # 2 images
-                st.markdown("### Generated images", unsafe_allow_html=True)
+                st.markdown('<div class="small-ital-grey">Generated images (last attempt)</div>', unsafe_allow_html=True)
                 c1, c2 = st.columns(2, gap="large")
                 with c1:
                     show_img_fixed(S.images_bytes[0], GEN_BOX)
                 with c2:
                     show_img_fixed(S.images_bytes[1], GEN_BOX)
-
 
     # st.markdown("###### Target image:")
 
