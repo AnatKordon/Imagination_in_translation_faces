@@ -940,10 +940,10 @@ with right:
         else:
             # We have at least one generated image – show it regardless of S.generated
             if len(S.gen_paths) == 1:
-                st.markdown('<div class="small-ital-grey">Generated image (last attempt)</div>', unsafe_allow_html=True)
+                st.markdown('<div class="small-ital-grey">Generated imagen</div>', unsafe_allow_html=True)
                 show_img_fixed(S.images_bytes[0], GEN_BOX)
             else:  # 2 images
-                st.markdown('<div class="small-ital-grey">Generated images (last attempt)</div>', unsafe_allow_html=True)
+                st.markdown('<div class="small-ital-grey">Generated images </div>', unsafe_allow_html=True)
                 c1, c2 = st.columns(2, gap="large")
                 with c1:
                     show_img_fixed(S.images_bytes[0], GEN_BOX)
