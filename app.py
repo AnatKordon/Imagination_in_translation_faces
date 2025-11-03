@@ -971,17 +971,17 @@ with right:
         st.caption("_Rate similarity_")
         # S.subjective_score = 
         st.slider(
-            "Please, rate the Similarity between the **Generated Image** and the image you have in mind (0 = not similar, 100 = very similar)",
+            "Does the face image match the distortion you experience? (0 = not similar, 100 = very similar)",
             min_value=0,
             max_value=100,
             value=50,  # default position
             step=1,
-            key=f"subjective_score_{S.session}_{S.attempt}", 
+            key=f"similarity_score_{S.session}_{S.attempt}", 
             disabled=not S.generated,
             # on_change=mark_rated I disable it as it causes issues with multiple images
         )
         # Add this after the slider to mark it as rated when they interact with it
-        rating_key = f"subjective_score_{S.session}_{S.attempt}"
+        rating_key = f"similarity_score_{S.session}_{S.attempt}"
         if rating_key in st.session_state:  # 50 is default
             mark_rated()
     # After displaying images / slider...
